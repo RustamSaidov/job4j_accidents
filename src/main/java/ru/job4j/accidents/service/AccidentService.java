@@ -7,7 +7,7 @@ import java.util.Optional;
 
 
 public interface AccidentService {
-    public Accident add(Accident accident);
+    public Accident create(Accident accident);
 
     public List<Accident> findAll();
 

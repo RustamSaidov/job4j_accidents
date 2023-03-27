@@ -19,7 +19,7 @@ public class SimpleAccidentService implements AccidentService {
 
 
     @Override
-    public Accident add(Accident accident) {
+    public Accident create(Accident accident) {
         return accidentRepository.add(accident);
     }
 

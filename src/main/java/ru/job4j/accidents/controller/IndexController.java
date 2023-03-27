@@ -1,7 +1,6 @@
 package ru.job4j.accidents.controller;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import ru.job4j.accidents.service.AccidentService;
 
@@ -13,12 +12,9 @@ public class IndexController {
         this.accidentService = accidentService;
     }
 
-    @GetMapping("/")
-    public String index(Model model) {
-        var accidents = accidentService.findAll();
-        model.addAttribute("accidents", accidents);
-        model.addAttribute("user", "IVAN IVANOV");
-        return "index";
+    @GetMapping({"/", "/index"})
+    public String getIndex() {
+        return "/index";
     }
 }
 
