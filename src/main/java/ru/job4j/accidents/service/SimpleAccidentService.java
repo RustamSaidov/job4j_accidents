@@ -34,11 +34,6 @@ public class SimpleAccidentService implements AccidentService {
     }
 
     @Override
-    public List<Accident> findByName(String key) {
-        return accidentRepository.findByName(key);
-    }
-
-    @Override
     public boolean replace(int id, Accident accident) {
         return accidentRepository.replace(id, accident);
     }

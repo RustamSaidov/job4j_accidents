@@ -13,8 +13,6 @@ public interface AccidentService {
 
     public Optional<Accident> findById(int id);
 
-    public List<Accident> findByName(String key);
-
     public boolean replace(int id, Accident accident);
 
     public boolean delete(int id);

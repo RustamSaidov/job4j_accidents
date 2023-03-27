@@ -8,15 +8,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Repository
 public class AccidentMem implements AccidentRepository {
-    private final Map<Integer, Accident> accidents = new ConcurrentHashMap<>();
 
-    private int id = 0;
+    private final Map<Integer, Accident> accidents = new ConcurrentHashMap<>();
+    private AtomicInteger id = new AtomicInteger();
+
+    public AccidentMem() {
+        add(new Accident(0, "name1", "text1", "address1"));
+        add(new Accident(0, "name2", "text2", "address2"));
+    }
 
     public Accident add(Accident accident) {
-        accident.setId(id++);
+        accident.setId(id.incrementAndGet());
         accidents.put(accident.getId(), accident);
         return accident;
     }
@@ -26,21 +32,7 @@ public class AccidentMem implements AccidentRepository {
     }
 
     public Optional<Accident> findById(int id) {
-        Optional<Accident> result = Optional.empty();
-        if (accidents.containsKey(id)) {
-            result = Optional.ofNullable(accidents.get(id));
-        }
-        return result;
-    }
-
-    public List<Accident> findByName(String key) {
-        List<Accident> list = new ArrayList<>();
-        for (Map.Entry<Integer, Accident> entry : accidents.entrySet()) {
-            if (entry.getValue().getName().matches(key)) {
-                list.add(entry.getValue());
-            }
-        }
-        return list;
+        return Optional.ofNullable(accidents.get(id));
     }
 
     public boolean replace(int id, Accident accident) {
