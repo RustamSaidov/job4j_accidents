@@ -42,6 +42,29 @@
             </div>
         </div>
     </div>
+
+    <div class="container">
+        <div class="row">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">Имя</th>
+                    <th scope="col">Действия</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="accident: ${accidents}">
+                    <td th:text="${accident.name}"/>
+                    <td>
+                        <a th:href="@{|/formUpdateAccident?id=${accident.id}|}">
+                            <i class="fa fa-edit">ПЕРЕИМЕНОВАТЬ ЗАДАНИЕ</i>
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 </body>
 </html>

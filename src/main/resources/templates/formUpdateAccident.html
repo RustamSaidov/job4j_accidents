@@ -30,37 +30,25 @@
             <a class="nav-link text-secondary me-3" href="#" th:text="${user}"></a>
         </div>
     </nav>
-
-    <div class="container">
-        <table class="table">
-            <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Название</th>
-                <th scope="col">Описание</th>
-                <th scope="col">Адрес</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="accident: ${accidents}">
-                <td th:text="${accident.id}"/>
-                <td><a th:text="${accident.name}"
-                       th:href="@{/edit_accident/{accidentId}(accidentId=${accident.id})}"></a></td>
-                <td th:text="${accident.text}"/>
-                <td th:text="${accident.address}"/>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-    <div class="mb-3 row">
-        <div class="col-6"></div>
-        <div class="col-6">
-            <div class="row">
-                <div class="col-6"><a class="btn btn-danger w-100" th:href="@{/createAccident}">Создать задание</a>
-                </div>
+    <div class="row pt-3">
+        <div class="card" style="width: 100%">
+            <div class="card-header">
+                Редатирование инцидента
+            </div>
+            <div class="card-body">
+                <form th:action="@{/updateAccident}" method="POST" th:object="${accident}">
+                    <input type="hidden" name="id" th:field="*{id}"/>
+                    <div class="form-group">
+                        <label for="name">Имя</label>
+                        <input type="text" class="form-control" name="name" id="name" th:field="*{name}">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                </form>
             </div>
         </div>
     </div>
+
+
 </div>
 </body>
 </html>
