@@ -66,9 +66,6 @@ public class AccidentController {
 
     @PostMapping("/updateAccident")
     public String save(@ModelAttribute Accident accident) {
-        Accident oldAccident = accidentService.findById(accident.getId()).get();
-        accident.setText(oldAccident.getText());
-        accident.setAddress(oldAccident.getAddress());
         accidentService.replace(accident.getId(), accident);
         return "redirect:/";
     }
