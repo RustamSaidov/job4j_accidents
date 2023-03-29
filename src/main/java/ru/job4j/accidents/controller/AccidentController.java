@@ -5,12 +5,17 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.job4j.accidents.model.Accident;
+import ru.job4j.accidents.model.AccidentType;
 import ru.job4j.accidents.service.AccidentService;
+import ru.job4j.accidents.service.AccidentTypeService;
+
+import java.util.List;
 
 @Controller
 @AllArgsConstructor
 public class AccidentController {
     private final AccidentService accidentService;
+    private final AccidentTypeService accidentTypeService;
 
     @GetMapping("/accidents")
     public String index(Model model) {
@@ -21,7 +26,9 @@ public class AccidentController {
     }
 
     @GetMapping("/createAccident")
-    public String viewCreateAccident() {
+    public String viewCreateAccident(Model model) {
+        List<AccidentType> types = accidentTypeService.findAll();
+        model.addAttribute("types", types);
         return "createAccident";
     }
 
@@ -39,10 +46,12 @@ public class AccidentController {
     @GetMapping("/edit_accident/{id}")
     public String updateById(Model model, @PathVariable int id) {
         var accidentOptional = accidentService.findById(id);
+        List<AccidentType> types = accidentTypeService.findAll();
         if (accidentOptional.isEmpty()) {
             model.addAttribute("message", "Происшествие с указанным идентификатором не найдено");
             return "errors/404";
         }
+        model.addAttribute("types", types);
         model.addAttribute("accident", accidentOptional.get());
         return "/edit_accident";
     }

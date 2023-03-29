@@ -15,14 +15,16 @@ public class AccidentMem implements AccidentRepository {
 
     private final Map<Integer, Accident> accidents = new ConcurrentHashMap<>();
     private AtomicInteger id = new AtomicInteger();
+    private AccidentTypeRepository accidentTypeRepository = new AccidentTypeMem();
 
     public AccidentMem() {
-        add(new Accident(0, "name1", "text1", "address1"));
-        add(new Accident(0, "name2", "text2", "address2"));
+        add(new Accident(0, "name1", "text1", "address1", accidentTypeRepository.findById(1).get()));
+        add(new Accident(0, "name2", "text2", "address2", accidentTypeRepository.findById(2).get()));
     }
 
     public Accident add(Accident accident) {
         accident.setId(id.incrementAndGet());
+        accident.setType(accidentTypeRepository.findById(accident.getType().getId()).get());
         accidents.put(accident.getId(), accident);
         return accident;
     }
@@ -36,6 +38,7 @@ public class AccidentMem implements AccidentRepository {
     }
 
     public boolean replace(int id, Accident accident) {
+        accident.setType(accidentTypeRepository.findById(accident.getType().getId()).get());
         return accidents.replace(id, accident) != null;
     }
 
