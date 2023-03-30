@@ -4,6 +4,7 @@ import net.jcip.annotations.ThreadSafe;
 import org.springframework.stereotype.Service;
 import ru.job4j.accidents.model.Accident;
 import ru.job4j.accidents.repository.AccidentRepository;
+import ru.job4j.accidents.repository.AccidentTypeRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,14 +13,17 @@ import java.util.Optional;
 @Service
 public class SimpleAccidentService implements AccidentService {
     private final AccidentRepository accidentRepository;
+    private final AccidentTypeRepository accidentTypeRepository;
 
-    public SimpleAccidentService(AccidentRepository accidentMem) {
+    public SimpleAccidentService(AccidentRepository accidentMem,AccidentTypeRepository accidentTypeRepository) {
         this.accidentRepository = accidentMem;
+        this.accidentTypeRepository = accidentTypeRepository;
     }
 
 
     @Override
     public Accident create(Accident accident) {
+        accident.setType(accidentTypeRepository.findById(accident.getType().getId()).get());
         return accidentRepository.add(accident);
     }
 
@@ -35,6 +39,7 @@ public class SimpleAccidentService implements AccidentService {
 
     @Override
     public boolean replace(int id, Accident accident) {
+        accident.setType(accidentTypeRepository.findById(accident.getType().getId()).get());
         return accidentRepository.replace(id, accident);
     }
 

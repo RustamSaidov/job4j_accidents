@@ -24,7 +24,6 @@ public class AccidentMem implements AccidentRepository {
 
     public Accident add(Accident accident) {
         accident.setId(id.incrementAndGet());
-        accident.setType(accidentTypeRepository.findById(accident.getType().getId()).get());
         accidents.put(accident.getId(), accident);
         return accident;
     }
@@ -38,7 +37,6 @@ public class AccidentMem implements AccidentRepository {
     }
 
     public boolean replace(int id, Accident accident) {
-        accident.setType(accidentTypeRepository.findById(accident.getType().getId()).get());
         return accidents.replace(id, accident) != null;
     }
 
