@@ -15,7 +15,7 @@ public class SimpleAccidentService implements AccidentService {
     private final AccidentRepository accidentRepository;
     private final AccidentTypeRepository accidentTypeRepository;
 
-    public SimpleAccidentService(AccidentRepository accidentMem,AccidentTypeRepository accidentTypeRepository) {
+    public SimpleAccidentService(AccidentRepository accidentMem, AccidentTypeRepository accidentTypeRepository) {
         this.accidentRepository = accidentMem;
         this.accidentTypeRepository = accidentTypeRepository;
     }
