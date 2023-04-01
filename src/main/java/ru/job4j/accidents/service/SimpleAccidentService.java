@@ -3,6 +3,7 @@ package ru.job4j.accidents.service;
 import net.jcip.annotations.ThreadSafe;
 import org.springframework.stereotype.Service;
 import ru.job4j.accidents.model.Accident;
+import ru.job4j.accidents.repository.AccidentJdbcTemplate;
 import ru.job4j.accidents.repository.AccidentRepository;
 import ru.job4j.accidents.repository.AccidentTypeRepository;
 
@@ -12,11 +13,11 @@ import java.util.Optional;
 @ThreadSafe
 @Service
 public class SimpleAccidentService implements AccidentService {
-    private final AccidentRepository accidentRepository;
+    private final AccidentJdbcTemplate accidentRepository;
     private final AccidentTypeRepository accidentTypeRepository;
 
-    public SimpleAccidentService(AccidentRepository accidentMem, AccidentTypeRepository accidentTypeRepository) {
-        this.accidentRepository = accidentMem;
+    public SimpleAccidentService(AccidentRepository accidentRepository, AccidentTypeRepository accidentTypeRepository) {
+        this.accidentRepository = (AccidentJdbcTemplate) accidentRepository;
         this.accidentTypeRepository = accidentTypeRepository;
     }
 
@@ -29,12 +30,21 @@ public class SimpleAccidentService implements AccidentService {
 
     @Override
     public List<Accident> findAll() {
-        return accidentRepository.findAll();
+        var list = accidentRepository.findAll();
+        for (int i = 0; i < list.size(); i++) {
+            var accident = list.get(i);
+            accident.setType(accidentTypeRepository.findById(accident.getType().getId()).get());
+        }
+        return list;
     }
 
     @Override
     public Optional<Accident> findById(int id) {
-        return accidentRepository.findById(id);
+        var accident = accidentRepository.findById(id);
+        if (accident.isPresent()) {
+            accident.get().setType(accidentTypeRepository.findById(accident.get().getType().getId()).get());
+        }
+        return accident;
     }
 
     @Override
