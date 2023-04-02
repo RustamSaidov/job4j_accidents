@@ -3,10 +3,14 @@ package ru.job4j.accidents.repository;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.job4j.accidents.model.Accident;
 import ru.job4j.accidents.model.AccidentType;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,10 +20,22 @@ import java.util.Optional;
 public class AccidentJdbcTemplate implements AccidentRepository {
 
     private final JdbcTemplate jdbc;
+    private final AccidentRuleJdbcTemplate accidentRuleJdbcTemplate;
 
     public Accident add(Accident accident) {
-        jdbc.update("insert into accidents (name) values (?, ?, ?, ? )",
-                accident.getName(), accident.getText(), accident.getAddress(), accident.getType());
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbc.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(
+                    "insert into accidents (name, text, address, type_id) values (?, ?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, accident.getName());
+            ps.setString(2, accident.getText());
+            ps.setString(3, accident.getAddress());
+            ps.setInt(4, accident.getType().getId());
+            return ps;
+        }, keyHolder);
+        accident.setId((int) keyHolder.getKeys().get("id"));
+        accidentRuleJdbcTemplate.add(accident.getId(), accident.getRules());
         return accident;
     }
 
@@ -34,6 +50,7 @@ public class AccidentJdbcTemplate implements AccidentRepository {
                     AccidentType accidentType = new AccidentType();
                     accidentType.setId(rs.getInt("type_id"));
                     accident.setType(accidentType);
+                    accident.setRules(accidentRuleJdbcTemplate.findById(rs.getInt("id")));
                     return accident;
                 });
     }
@@ -53,6 +70,7 @@ public class AccidentJdbcTemplate implements AccidentRepository {
                     AccidentType accidentType = new AccidentType();
                     accidentType.setId(resultSet.getInt("type_id"));
                     newAccident.setType(accidentType);
+                    newAccident.setRules(accidentRuleJdbcTemplate.findById(resultSet.getInt("id")));
                     return newAccident;
                 },
                 id);
@@ -64,6 +82,7 @@ public class AccidentJdbcTemplate implements AccidentRepository {
 
     @Override
     public boolean replace(int id, Accident accident) {
+        accidentRuleJdbcTemplate.replace(accident.getId(), accident);
         return jdbc.update(
                 "update accidents set name = ?, text = ?, address = ?, type_id = ? where id = ?",
                 accident.getName(), accident.getText(), accident.getAddress(), accident.getType().getId(), id)
