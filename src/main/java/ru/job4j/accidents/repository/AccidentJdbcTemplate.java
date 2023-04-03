@@ -14,7 +14,7 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 
-@Primary
+
 @Repository
 @AllArgsConstructor
 public class AccidentJdbcTemplate implements AccidentRepository {
