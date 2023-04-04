@@ -74,7 +74,7 @@ public class AccidentController {
             String[] ids = req.getParameterValues("rIds");
             Set<Rule> rules = ruleService.getSetRuleByIdArray(ids);
             accident.setRules(rules);
-            accidentService.replace(accident.getId(), accident);
+            accidentService.replace(accident);
             return "redirect:/accidents";
         } catch (Exception exception) {
             model.addAttribute("message", exception.getMessage());
@@ -92,7 +92,7 @@ public class AccidentController {
     public String update(@ModelAttribute Accident accident) {
         Set<Rule> rules = accidentService.findById(accident.getId()).get().getRules();
         accident.setRules(rules);
-        accidentService.replace(accident.getId(), accident);
+        accidentService.replace(accident);
         return "redirect:/";
     }
 }

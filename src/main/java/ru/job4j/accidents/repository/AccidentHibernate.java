@@ -1,13 +1,12 @@
 package ru.job4j.accidents.repository;
 
 import lombok.AllArgsConstructor;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 import ru.job4j.accidents.model.Accident;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -15,135 +14,83 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Primary
 public class AccidentHibernate implements AccidentRepository {
-    private final SessionFactory sf;
-    private final AccidentRuleJdbcTemplate accidentRuleJdbcTemplate;
+    private final CrudRepository crudRepository;
 
-
-    @Override
-    public Accident add(Accident accident) {
-        Session session = sf.openSession();
+    /**
+     * Сохранить в базе.
+     *
+     * @param accident происшествие.
+     * @return Optional of accident.
+     */
+    public Optional<Accident> add(Accident accident) {
         try {
-            session.beginTransaction();
-            session.save(accident);
-            session.getTransaction().commit();
-        } catch (Exception e) {
-            session.getTransaction().rollback();
+            crudRepository.run(session -> session.persist(accident));
+        } catch (Exception exception) {
+            return Optional.empty();
         }
-        session.close();
-        return accident;
+        return Optional.ofNullable(accident);
     }
 
-    @Override
-    public boolean replace(int id, Accident accident) {
-        System.out.println("!!!!!!!!!!!!!!!!!!!" + accident);
-        boolean result = true;
-        Session session = sf.openSession();
+    /**
+     * Удалить происшествие по id.
+     *
+     * @return boolean.
+     */
+    public boolean delete(int accidentId) {
         try {
-            System.out.println("1!!!!!!!!!!!!!!!!!!!");
-            session.beginTransaction();
-            session.createQuery("""
-                            UPDATE Accident
-                            SET name = :name, text = :text, address = :address, type_id = :type_id
-                            WHERE id = :id
-                            """)
-                    .setParameter("name", accident.getName())
-                    .setParameter("text", accident.getText())
-                    .setParameter("address", accident.getAddress())
-                    .setParameter("type_id", accident.getType().getId())
-                    .setParameter("id", accident.getId())
-                    .executeUpdate();
-            session.getTransaction().commit();
-            /*System.out.println("2!!!!!!!!!!!!!!!!!!!");
-            session.beginTransaction();
-            session.createQuery("""
-                    "delete from accident_rules where accident_id = :accident_id"
-                    """)
-                    .setParameter("accident_id", accident.getId())
-                    .executeUpdate();
-            session.getTransaction().commit();
-            System.out.println("3!!!!!!!!!!!!!!!!!!!");
-            session.beginTransaction();
-            var ruleSet = accident.getRules();
-            for (Rule rule : ruleSet) {
-                session.createSQLQuery("insert into accident_rules (accident_id, rules_id) values (:accident_id, :rules_id)")
-                        .setParameter("accident_id", accident.getId())
-                        .setParameter("rules_id", rule.getId())
-                        .executeUpdate();
-                session.getTransaction().commit();
-            }
-            System.out.println("4!!!!!!!!!!!!!!!!!!!");
+            crudRepository.run(
+                    "delete from Accident where id = :fId",
+                    Map.of("fId", accidentId));
+        } catch (Exception exception) {
+            return false;
+        }
+        return true;
+    }
 
-             */
-        } catch (Exception e) {
-            session.getTransaction().rollback();
-            result = false;
+    /**
+     * Обновить в базе происшествие.
+     *
+     * @param accident задание.
+     * @return boolean.
+     */
+    public boolean replace(Accident accident) {
+        try {
+            crudRepository.run(session -> session.merge(accident));
+        } catch (Exception exception) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Найти происшествие по id.
+     *
+     * @param id ID.
+     * @return Optional of accident.
+     */
+    @Override
+    public Optional<Accident> findById(int id) {
+        Optional<Accident> result = Optional.empty();
+        try {
+            result = crudRepository.optional("""
+                             from Accident as a WHERE a.id = :fId
+                            """, Accident.class,
+                    Map.of("fId", id));
+        } catch (Exception exception) {
+            return result;
         }
         return result;
     }
 
-    /*
-            @Override
-        public void update(Task task) {
-            Session session = sf.openSession();
-            try {
-                session.beginTransaction();
-                session.createQuery("""
-                        UPDATE Task
-                        SET description = :description, created = :created,
-                            done = :done
-                        WHERE id = :id
-                        """)
-                        .setParameter("description", task.getDescription())
-                        .setParameter("created", task.getCreated())
-                        .setParameter("done", task.isDone())
-                        .setParameter("fId", task.getId())
-                        .executeUpdate();
-                session.getTransaction().commit();
-            } catch (Exception e) {
-                session.getTransaction().rollback();
-            }
-        }
-
+    /**
+     * Список происшествий отсортированных по id.
+     *
+     * @return список происшествий.
      */
     @Override
     public List<Accident> findAll() {
-        try (Session session = sf.openSession()) {
-            var result = session
-                    .createQuery("FROM Accident a JOIN FETCH a.type JOIN FETCH a.rules ORDER BY a.id", Accident.class)
-                    .list();
-            List<Accident> resultWithoutDuplicates = result.stream()
-                    .distinct()
-                    .collect(Collectors.toList());
-            return resultWithoutDuplicates;
-        }
+        var list = crudRepository.query("FROM Accident a JOIN FETCH a.type JOIN FETCH a.rules ORDER BY a.id", Accident.class);
+        return list.stream().distinct().collect(Collectors.toList());
     }
 
-    @Override
-    public Optional<Accident> findById(int id) {
-        Session session = sf.openSession();
-        session.beginTransaction();
-        Accident result = session.get(Accident.class, id);
-        session.getTransaction().commit();
-        session.close();
-        return Optional.ofNullable(result);
-    }
-
-    @Override
-    public boolean delete(int id) {
-        boolean result = true;
-        Session session = sf.openSession();
-        try {
-            session.beginTransaction();
-            session.createQuery(
-                            "DELETE Accident WHERE id = :fId")
-                    .setParameter("fId", id)
-                    .executeUpdate();
-            session.getTransaction().commit();
-        } catch (Exception e) {
-            session.getTransaction().rollback();
-            result = false;
-        }
-        session.close();
-        return result;
-    }
 }

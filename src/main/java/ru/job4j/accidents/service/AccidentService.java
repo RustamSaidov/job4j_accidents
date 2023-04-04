@@ -7,13 +7,13 @@ import java.util.Optional;
 
 
 public interface AccidentService {
-    public Accident create(Accident accident);
+    public Optional<Accident> create(Accident accident);
 
     public List<Accident> findAll();
 
     public Optional<Accident> findById(int id);
 
-    public boolean replace(int id, Accident accident);
+    public boolean replace(Accident accident);
 
     public boolean delete(int id);
 }

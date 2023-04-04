@@ -21,7 +21,7 @@ public class AccidentJdbcTemplate implements AccidentRepository {
     private final JdbcTemplate jdbc;
     private final AccidentRuleJdbcTemplate accidentRuleJdbcTemplate;
 
-    public Accident add(Accident accident) {
+    public Optional<Accident> add(Accident accident) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(
@@ -35,7 +35,7 @@ public class AccidentJdbcTemplate implements AccidentRepository {
         }, keyHolder);
         accident.setId((int) keyHolder.getKeys().get("id"));
         accidentRuleJdbcTemplate.add(accident.getId(), accident.getRules());
-        return accident;
+        return Optional.ofNullable(accident);
     }
 
     public List<Accident> findAll() {
@@ -80,11 +80,11 @@ public class AccidentJdbcTemplate implements AccidentRepository {
     }
 
     @Override
-    public boolean replace(int id, Accident accident) {
+    public boolean replace(Accident accident) {
         accidentRuleJdbcTemplate.replace(accident.getId(), accident);
         return jdbc.update(
                 "update accidents set name = ?, text = ?, address = ?, type_id = ? where id = ?",
-                accident.getName(), accident.getText(), accident.getAddress(), accident.getType().getId(), id)
+                accident.getName(), accident.getText(), accident.getAddress(), accident.getType().getId(), accident.getId())
                 != 0;
     }
 

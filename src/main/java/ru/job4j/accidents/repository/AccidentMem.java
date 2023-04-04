@@ -21,10 +21,10 @@ public class AccidentMem implements AccidentRepository {
         add(new Accident(0, "name2", "text2", "address2", accidentTypeRepository.findById(2).get(), new HashSet<Rule>(ruleRepository.findAll())));
     }
 
-    public Accident add(Accident accident) {
+    public Optional<Accident> add(Accident accident) {
         accident.setId(id.incrementAndGet());
         accidents.put(accident.getId(), accident);
-        return accident;
+        return Optional.ofNullable(accident);
     }
 
     public List<Accident> findAll() {
@@ -35,8 +35,8 @@ public class AccidentMem implements AccidentRepository {
         return Optional.ofNullable(accidents.get(id));
     }
 
-    public boolean replace(int id, Accident accident) {
-        return accidents.replace(id, accident) != null;
+    public boolean replace(Accident accident) {
+        return accidents.replace(accident.getId(), accident) != null;
     }
 
     public boolean delete(int id) {

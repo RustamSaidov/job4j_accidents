@@ -18,7 +18,7 @@ public class SimpleAccidentService implements AccidentService {
     private final AccidentTypeRepository accidentTypeRepository;
 
     @Override
-    public Accident create(Accident accident) {
+    public Optional<Accident> create(Accident accident) {
         accident.setType(accidentTypeRepository.findById(accident.getType().getId()).get());
         return accidentRepository.add(accident);
     }
@@ -43,9 +43,9 @@ public class SimpleAccidentService implements AccidentService {
     }
 
     @Override
-    public boolean replace(int id, Accident accident) {
+    public boolean replace(Accident accident) {
         accident.setType(accidentTypeRepository.findById(accident.getType().getId()).get());
-        return accidentRepository.replace(id, accident);
+        return accidentRepository.replace(accident);
     }
 
     @Override
