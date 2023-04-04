@@ -4,8 +4,7 @@ import lombok.AllArgsConstructor;
 import net.jcip.annotations.ThreadSafe;
 import org.springframework.stereotype.Service;
 import ru.job4j.accidents.model.Accident;
-import ru.job4j.accidents.repository.AccidentHibernate;
-import ru.job4j.accidents.repository.AccidentTypeRepository;
+import ru.job4j.accidents.repository.AccidentJPARepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +13,33 @@ import java.util.Optional;
 @Service
 @AllArgsConstructor
 public class SimpleAccidentService implements AccidentService {
+    private final AccidentJPARepository accidentJPARepository;
+
+    public Optional<Accident> create(Accident accident) {
+        return Optional.ofNullable(accidentJPARepository.save(accident));
+    }
+
+    @Override
+    public List<Accident> findAll() {
+        return (List<Accident>) accidentJPARepository.findAll();
+    }
+
+    @Override
+    public Optional<Accident> findById(int id) {
+        return accidentJPARepository.findById(id);
+    }
+
+    @Override
+    public boolean replace(Accident accident) {
+        return accidentJPARepository.save(accident).getId() != 0;
+    }
+
+    @Override
+    public boolean delete(int id) {
+        accidentJPARepository.deleteById(id);
+        return true;
+    }
+   /*ДЛЯ HIBERNATE варианта:
     private final AccidentHibernate accidentRepository;
     private final AccidentTypeRepository accidentTypeRepository;
 
@@ -52,4 +78,5 @@ public class SimpleAccidentService implements AccidentService {
     public boolean delete(int id) {
         return accidentRepository.delete(id);
     }
+    */
 }
