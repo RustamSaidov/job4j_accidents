@@ -5,8 +5,6 @@ import net.jcip.annotations.ThreadSafe;
 import org.springframework.stereotype.Service;
 import ru.job4j.accidents.model.Accident;
 import ru.job4j.accidents.repository.AccidentHibernate;
-import ru.job4j.accidents.repository.AccidentJdbcTemplate;
-import ru.job4j.accidents.repository.AccidentRepository;
 import ru.job4j.accidents.repository.AccidentTypeRepository;
 
 import java.util.List;
