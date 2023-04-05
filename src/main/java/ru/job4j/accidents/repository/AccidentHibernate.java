@@ -23,11 +23,7 @@ public class AccidentHibernate implements AccidentRepository {
      * @return Optional of accident.
      */
     public Optional<Accident> add(Accident accident) {
-        try {
-            crudRepository.run(session -> session.persist(accident));
-        } catch (Exception exception) {
-            return Optional.empty();
-        }
+        crudRepository.run(session -> session.persist(accident));
         return Optional.ofNullable(accident);
     }
 
