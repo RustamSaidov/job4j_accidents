@@ -21,7 +21,7 @@ public class SimpleAccidentService implements AccidentService {
 
     @Override
     public List<Accident> findAll() {
-        return accidentJPARepository.getAll();
+        return accidentJPARepository.findAll();
     }
 
     @Override

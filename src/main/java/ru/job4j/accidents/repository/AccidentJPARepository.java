@@ -6,8 +6,5 @@ import ru.job4j.accidents.model.Accident;
 import java.util.List;
 
 public interface AccidentJPARepository extends CrudRepository<Accident, Integer> {
-
-    public default List<Accident> getAll() {
-        return (List<Accident>) findAll();
-    }
+    List<Accident> findAll();
 }
