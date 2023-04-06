@@ -1,5 +1,5 @@
 package ru.job4j.accidents.controller;
-/*
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
@@ -39,5 +39,3 @@ public class LoginController {
         return "redirect:/login?logout=true";
     }
 }
-
- */
