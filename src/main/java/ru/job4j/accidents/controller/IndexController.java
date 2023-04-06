@@ -14,15 +14,6 @@ public class IndexController {
         this.accidentService = accidentService;
     }
 
-//    @GetMapping({"/", "/index"})
-//    public String getIndex(Model model) {
-//        var accidents = accidentService.findAll();
-//        model.addAttribute("accidents", accidents);
-//        model.addAttribute("user", "IVAN IVANOV");
-//        return "/index";
-//    }
-
-
     @GetMapping({"/", "/index"})
     public String index(Model model) {
         model.addAttribute("user", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
