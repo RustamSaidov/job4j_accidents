@@ -1,6 +1,7 @@
 package ru.job4j.accidents.controller;
 
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,7 @@ public class AccidentController {
     public String index(Model model) {
         var accidents = accidentService.findAll();
         model.addAttribute("accidents", accidents);
-        model.addAttribute("user", "IVAN IVANOV");
+        model.addAttribute("user", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         return "/accidents";
     }
 
@@ -36,6 +37,7 @@ public class AccidentController {
         model.addAttribute("types", types);
         List<Rule> rules = ruleService.findAll();
         model.addAttribute("rules", rules);
+        model.addAttribute("user", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         return "createAccident";
     }
 
@@ -65,6 +67,7 @@ public class AccidentController {
         model.addAttribute("accident", accidentOptional.get());
         List<Rule> rules = ruleService.findAll();
         model.addAttribute("rules", rules);
+        model.addAttribute("user", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         return "/edit_accident";
     }
 
@@ -85,6 +88,7 @@ public class AccidentController {
     @GetMapping("/formUpdateAccident")
     public String updateById(@RequestParam("id") int id, Model model) {
         model.addAttribute("accident", accidentService.findById(id).get());
+        model.addAttribute("user", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         return "/formUpdateAccident";
     }
 
