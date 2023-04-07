@@ -7,7 +7,6 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -17,15 +16,21 @@ import javax.sql.DataSource;
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
+    PasswordEncoder passwordEncoder;
+
+    @Autowired
     DataSource ds;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.jdbcAuthentication()
-                .dataSource(ds)
-                .withUser(User.withUsername("user")
-                        .password(passwordEncoder().encode("123456"))
-                        .roles("USER"));
+        auth.jdbcAuthentication().dataSource(ds)
+                .usersByUsernameQuery("select username, password, enabled "
+                        + "from users "
+                        + "where username = ?")
+                .authoritiesByUsernameQuery(
+                        " select u.username, a.authority "
+                                + "from authorities as a, users as u "
+                                + "where u.username = ? and u.authority_id = a.id");
     }
 
     /*АВТОРИЗАЦИЯ С ЮЗЕРОМ, ХРАНЯЩИМСЯ В ПАМЯТИ:
@@ -49,7 +54,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/login")
+                .antMatchers("/login", "/reg", "/css/signin.css")
                 .permitAll()
                 .antMatchers("/**")
                 .hasAnyRole("ADMIN", "USER")
