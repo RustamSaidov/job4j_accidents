@@ -14,6 +14,16 @@ import java.util.Set;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "accidents")
+
+/*
+Исключение LazyInitialization Решил вопрос через аннотацию @Transactional в тестовых классах.
+@NamedEntityGraph(
+        name = "accident-entity-graph",
+        attributeNodes = {
+                @NamedAttributeNode("type"),
+                @NamedAttributeNode("rules")
+        }
+)*/
 public class Accident {
     @EqualsAndHashCode.Include
     @Id
@@ -22,7 +32,7 @@ public class Accident {
     private String name;
     private String text;
     private String address;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "type_id")
     private AccidentType type;
     @ManyToMany
