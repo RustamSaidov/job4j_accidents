@@ -32,7 +32,7 @@ public class Accident {
     private String name;
     private String text;
     private String address;
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "type_id")
     private AccidentType type;
     @ManyToMany
