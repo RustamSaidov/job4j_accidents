@@ -93,10 +93,15 @@ public class AccidentController {
     }
 
     @PostMapping("/updateAccident")
-    public String update(@ModelAttribute Accident accident) {
-        Set<Rule> rules = accidentService.findById(accident.getId()).get().getRules();
-        accident.setRules(rules);
-        accidentService.replace(accident);
-        return "redirect:/";
+    public String update(@ModelAttribute Accident accident, Model model) {
+        try {
+            Set<Rule> rules = accidentService.findById(accident.getId()).get().getRules();
+            accident.setRules(rules);
+            accidentService.replace(accident);
+            return "redirect:/accidents";
+        } catch (Exception exception) {
+            model.addAttribute("message", exception.getMessage());
+            return "errors/404";
+        }
     }
 }
